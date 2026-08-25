@@ -1,5 +1,42 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
+const { hashPassword } = require("../utils/password");
+
+const addressSchema = new mongoose.Schema(
+  {
+    label: {
+      type: String,
+      maxLength: 120,
+      trim: true,
+    },
+    fullName: {
+      type: String,
+      maxLength: 120,
+      trim: true,
+    },
+    phone: {
+      type: String,
+      maxLength: 120,
+      trim: true,
+    },
+    city: {
+      type: String,
+      maxLength: 120,
+      trim: true,
+    },
+    state: {
+      type: String,
+      maxLength: 120,
+      trim: true,
+    },
+    pincode: {
+      type: Number,
+      maxLength: 6,
+      trim: true,
+    },
+    isDefault: { type: Boolean, default: false },
+  },
+  { _id: true },
+);
 
 const userSchema = new mongoose.Schema(
   {
@@ -7,86 +44,52 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
-      maxlength: 60,
+      maxLength: 128,
     },
-
     email: {
       type: String,
       required: true,
       unique: true,
       lowercase: true,
-      index: true,
     },
-
     password: {
       type: String,
       required: true,
       minlength: 6,
+      maxLength: 128,
       select: false,
     },
-
     phone: {
       type: String,
-      match: /^[6-9]\d{9}$/,
+      maxLength: 10,
     },
-
     role: {
       type: String,
       enum: ["user", "seller", "admin"],
       default: "user",
       index: true,
     },
-
     isActive: {
-      type: Boolean,
-      default: true,
+      type: String,
+      default: false,
     },
-
-    avatar: {
-      url: String,
-      publicId: String,
+    profilePhoto: {
+      url: {
+        type: String,
+      },
+      publicId: {
+        type: String,
+      },
     },
-
     shopName: {
       type: String,
+      trim: true,
     },
-
-    addresses: [
-      {
-        label: String,
-        fullName: String,
-        phone: String,
-        line1: String,
-        line2: String,
-        city: String,
-        state: String,
-        pincode: String,
-
-        isDefault: {
-          type: Boolean,
-          default: false,
-        },
-      },
-    ],
+    addresses: [addressSchema],
   },
-  {
-    timestamps: true,
-  },
+  { timestamps: true },
 );
 
-// Hash password before saving
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) {
-    return next();
-  }
+const UserModel = mongoose.model("user", userSchema);
 
-  this.password = await bcrypt.hash(this.password, 10);
-  next();
-});
-
-// Compare password
-userSchema.methods.isPasswordCorrect = async function (plainPassword) {
-  return await bcrypt.compare(plainPassword, this.password);
-};
-
-module.exports = mongoose.model("User", userSchema);
+module.exports = UserModel;

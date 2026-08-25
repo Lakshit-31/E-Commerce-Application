@@ -1,27 +1,24 @@
 const express = require("express");
 const helmet = require("helmet");
+const apiResponse = require("./utils/apiResponse");
+const AuthRouter = require("./modules/auth/authRoutes");
+const UserRouter = require("./modules/user/userRoutes");
+require("dotenv").config();
+const cookieParser = require("cookie-parser");
+const notFound = require("./middlewares/notFoundmiddleware");
+const errorHandler = require("./middlewares/errorHandlermiddleware");
+const asyncHandler = require("./utils/asyncHandler");
+
 const app = express();
-const cookiePareser = require("cookieParser");
-const cors = require("cors");
-const mongoSenitization = require("mongoSenitization");
+
 app.use(express.json());
-app.use(helmet());
-app.use(cors({ origin, credential: true }));
-app.use(cookiePareser());
-app.use(mongoSenitization());
+app.use(cookieParser());
 
-cookieParser();
+// All routes
+app.use("/api/v1/auth", AuthRouter);
+app.use("/api/v1/user", UserRouter);
 
-mongoSanitize();
-compression();
-morgan("dev");
-rateLimit();
-
-// ---	routes	--
-// notFound
-// errorHandler
-
-app.get("/api/v1/health", (_req, res) =>
+app.get("/api/v1/health", (req, res) =>
   res.status(200).json(
     apiResponse(
       200,
@@ -29,10 +26,21 @@ app.get("/api/v1/health", (_req, res) =>
         service: "ecom-backend",
         env: process.env.NODE_ENV,
         uptimeSeconds: Math.round(process.uptime()),
-        timestamp: new Date().toIsoString(),
+        timestamp: new Date().toISOString(),
       },
-      "API is running",
+      "API	is	running",
     ),
   ),
 );
+
+app.get(
+  "/api/v1/boom",
+  asyncHandler(async () => {
+    throw apiError(418, "This	error	was	thrown	on	purpose	to	test	errorHandler");
+  }),
+);
+
+app.use(notFound);
+app.use(errorHandler);
+
 module.exports = app;

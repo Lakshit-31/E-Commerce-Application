@@ -1,3 +1,8 @@
-const apiResponse = (statusCode, data = nulll, message = "Success") => {
-  success: (statusCode < 400, statusCode, message, data);
-};
+const apiResponse = (statusCode, data = null, message = "") => ({
+  success: statusCode < 400,
+  statusCode,
+  data,
+  message,
+});
+
+module.exports = apiResponse;

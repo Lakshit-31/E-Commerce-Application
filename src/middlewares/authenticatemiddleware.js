@@ -1,0 +1,32 @@
+const UserModel = require("../models/userModel");
+const { getUserDataById } = require("../modules/auth/authService");
+const apiError = require("../utils/apiError");
+const apiResponse = require("../utils/apiResponse");
+const asyncHandler = require("../utils/asyncHandler");
+const { UNAUTHORIZED, NOT_FOUND } = require("../utils/httpStatus");
+const { verifyAccessToken } = require("../utils/token");
+
+const validattionMiddleware = asyncHandler(async (req, res, next) => {
+  const accessToken = req.cookies.accessToken;
+  if (!accessToken) {
+    res
+      .status(UNAUTHORIZED)
+      .json(apiError(UNAUTHORIZED, "Token not found Please login again"));
+  }
+
+  console.log("accessToken", accessToken);
+
+  const decode = verifyAccessToken(accessToken);
+  console.log("middleware decode 17 line", decode);
+  const userData = await getUserDataById({ _id: decode.sub });
+  // const userData = await UserModel.findById({_id:decode.sub});
+  console.log("useData", userData);
+  if (!userData) {
+    res.status(NOT_FOUND).json(apiError(NOT_FOUND, "user not found"));
+  }
+  req.user = userData;
+
+  next();
+});
+
+module.exports = validattionMiddleware;
