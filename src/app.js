@@ -3,6 +3,7 @@ const helmet = require("helmet");
 const apiResponse = require("./utils/apiResponse");
 const AuthRouter = require("./modules/auth/authRoutes");
 const UserRouter = require("./modules/user/userRoutes");
+const CategoryRouter = require("./modules/category/categoryroutes");
 require("dotenv").config();
 const cookieParser = require("cookie-parser");
 const notFound = require("./middlewares/notFoundmiddleware");
@@ -17,6 +18,7 @@ app.use(cookieParser());
 // All routes
 app.use("/api/v1/auth", AuthRouter);
 app.use("/api/v1/user", UserRouter);
+app.use("/api/v1/categories", CategoryRouter);
 
 app.get("/api/v1/health", (req, res) =>
   res.status(200).json(

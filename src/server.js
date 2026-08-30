@@ -1,6 +1,8 @@
-require("dotenv").config();
 const app = require("./app");
 const connectDB = require("./config/db");
+require("dotenv").config({
+  path: require("path").resolve(__dirname, "../.env"),
+});
 
 const PORT = process.env.PORT;
 const start = async () => {
@@ -11,7 +13,7 @@ const start = async () => {
   }
 
   const server = app.listen(PORT, () => {
-    console.log(`server listen on port http://localhost:${PORT}`);
+    console.log(`server listen on port ${PORT}`);
   });
 };
 

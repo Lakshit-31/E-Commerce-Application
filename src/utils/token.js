@@ -5,7 +5,7 @@ const signAccessToken = (user) =>
   jwt.sign(
     { sub: String(user._id), role: user.role },
     process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: process.env.ACCESS_TOKEN_EXPIRY || "40s" },
+    { expiresIn: process.env.ACCESS_TOKEN_EXPIRY || "1d" },
   );
 
 const signRefreshToken = (user) =>

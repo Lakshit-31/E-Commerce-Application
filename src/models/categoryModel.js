@@ -26,7 +26,6 @@ const categorySchema = new mongoose.Schema(
       ref: "Category",
       default: null,
       index: true,
-      // null = top-level category
     },
 
     position: {
@@ -44,4 +43,11 @@ const categorySchema = new mongoose.Schema(
   },
 );
 
-module.exports = mongoose.model("Category", categorySchema);
+categorySchema.pre("validate", function setSlug(name) {
+  if (this.isModified("name") || !this.slug) this.slug = convertToSlug(name);
+  next();
+});
+
+const CategoryModel = mongoose.model("Category", categorySchema);
+
+module.exports = CategoryModel;

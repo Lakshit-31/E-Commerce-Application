@@ -1,4 +1,4 @@
-import { ROLES } from "./roles.js";
+const ROLES = require("./roles");
 
 /**
  * RBAC - the coarse question: "does this ROLE have this permission AT ALL?"
@@ -11,7 +11,7 @@ import { ROLES } from "./roles.js";
  * The suffix does NOT enforce ownership by itself - it only records intent.
  * Actually checking "is this YOUR record" is ABAC's job (policy.js).
  */
-export const PERMISSIONS = {
+const PERMISSIONS = {
   [ROLES.ADMIN]: [
     "user:read:any",
     "user:manage:any",
@@ -22,7 +22,6 @@ export const PERMISSIONS = {
     "category:manage",
     "brand:manage",
     "banner:manage",
-    // An admin is also a person who can shop. Day 7 needs these.
     "cart:manage:own",
     "wishlist:manage:own",
     "order:create",
@@ -61,7 +60,7 @@ export const PERMISSIONS = {
   ],
 };
 
-export const hasPermission = (role, required) => {
+const hasPermission = (role, required) => {
   const granted = PERMISSIONS[role] ?? [];
   return (
     granted.includes(required) ||
@@ -69,3 +68,16 @@ export const hasPermission = (role, required) => {
     granted.includes(`${required}:any`)
   );
 };
+
+hasPermission("user", "cart:manage:own")[ROLES.USER] == "user";
+PERMISSIONS.user = [
+  "user:read:own",
+  "user:manage:own",
+  "product:read",
+  "cart:manage:own",
+  "wishlist:manage:own",
+  "order:create",
+  "order:read:own",
+  "return:create:own",
+];
+module.exports = { PERMISSIONS, hasPermission };

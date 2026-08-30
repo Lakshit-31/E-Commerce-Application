@@ -7,7 +7,6 @@ const { signAccessToken, signRefreshToken } = require("../../utils/token");
 
 // register Api service
 const registerService = async (data) => {
-  console.log(data, "body data");
   const { name, email, password, role } = data;
 
   const isExist = await UserModel.findOne({ email });
@@ -50,7 +49,7 @@ const createRefreshService = async (data) => {
 // response
 const loginService = async (data) => {
   const { email, password } = data;
-  console.log("service data", data);
+
   // user exist (email check)
   const isUser = await UserModel.findOne({ email }).select("+password");
   if (!isUser) {
@@ -68,7 +67,6 @@ const loginService = async (data) => {
 
 // logout Api service
 const logoutService = async (user) => {
-  console.log("logoutservice data", user);
   await RefreshModel.deleteMany({
     user: user.userID,
   });
