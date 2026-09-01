@@ -9,6 +9,7 @@ const cookieParser = require("cookie-parser");
 const notFound = require("./middlewares/notFoundmiddleware");
 const errorHandler = require("./middlewares/errorHandlermiddleware");
 const asyncHandler = require("./utils/asyncHandler");
+const BrandRouter = require("./modules/brand/brandRoutes");
 
 const app = express();
 
@@ -19,6 +20,8 @@ app.use(cookieParser());
 app.use("/api/v1/auth", AuthRouter);
 app.use("/api/v1/user", UserRouter);
 app.use("/api/v1/categories", CategoryRouter);
+app.use("/api/v1/brands", BrandRouter);
+// app.use("/api/v1/products", ProductRouter);
 
 app.get("/api/v1/health", (req, res) =>
   res.status(200).json(

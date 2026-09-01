@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+const { convertToSlug, nanoId } = require("../utils/slug");
 const productSchema = new mongoose.Schema(
   {
     title: {
@@ -35,14 +35,23 @@ const productSchema = new mongoose.Schema(
 
     images: [
       {
-        url: String,
-        publicId: String,
+        url: {
+          type: String,
+          required: true,
+        },
+        publicId: {
+          type: String,
+        },
       },
     ],
 
     video: {
-      url: String,
-      publicId: String,
+      url: {
+        type: String,
+      },
+      publicId: {
+        type: String,
+      },
     },
 
     category: {
@@ -66,7 +75,7 @@ const productSchema = new mongoose.Schema(
 
     seller: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "user",
       required: true,
       index: true,
     },
@@ -81,7 +90,7 @@ const productSchema = new mongoose.Schema(
     tags: [
       {
         type: String,
-        enum: ["trending", "top-selling", "new"],
+        trim: true,
       },
     ],
 
@@ -95,16 +104,19 @@ const productSchema = new mongoose.Schema(
     ratingCount: {
       type: Number,
       default: 0,
+      min: 0,
     },
 
     soldCount: {
       type: Number,
       default: 0,
+      min: 0,
     },
 
     isActive: {
       type: Boolean,
       default: true,
+      index: true,
     },
   },
   {
@@ -112,44 +124,16 @@ const productSchema = new mongoose.Schema(
   },
 );
 
-// Virtual: discount percentage
 productSchema.virtual("discountPercent").get(function () {
-  if (!this.mrp || this.mrp <= 0) {
-    return 0;
-  }
+  if (!this.mrp || this.mrp <= 0) return 0;
 
   return Math.round(((this.mrp - this.price) / this.mrp) * 100);
 });
 
-// Virtual: stock status
 productSchema.virtual("inStock").get(function () {
   return this.stockQty > 0;
 });
 
-// Generate slug before validation
-productSchema.pre("validate", function (next) {
-  if (this.isModified("title") || !this.slug) {
-    const baseSlug = this.title
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "");
-
-    // Random 6-character string
-    const randomString = Math.random().toString(36).substring(2, 8);
-
-    this.slug = `${baseSlug}-${randomString}`;
-  }
-
-  // Price cannot exceed MRP
-  if (this.price > this.mrp) {
-    return next(new Error("Price cannot exceed MRP"));
-  }
-
-  next();
-});
-
-// Include virtuals in JSON response
 productSchema.set("toJSON", {
   virtuals: true,
 });
@@ -157,5 +141,21 @@ productSchema.set("toJSON", {
 productSchema.set("toObject", {
   virtuals: true,
 });
+productSchema.pre("validate", function (next) {
+  if (this.isModified("title") || !this.slug) {
+    this.slug = this.slug = convertToSlug(this.name) - nanoId();
+  }
 
-module.exports = mongoose.model("Product", productSchema);
+  next();
+});
+
+productSchema.pre("validate", function (next) {
+  if (this.price > this.mrp) {
+    this.invalidate("price", "Price cannot exceed MRP");
+  }
+  next();
+});
+
+const ProductModel = mongoose.model("Product", productSchema);
+
+module.exports = ProductModel;

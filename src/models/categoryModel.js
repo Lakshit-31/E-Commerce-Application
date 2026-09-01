@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { convertToSlug, nanoId } = require("../utils/slug");
 
 const categorySchema = new mongoose.Schema(
   {
@@ -43,9 +44,10 @@ const categorySchema = new mongoose.Schema(
   },
 );
 
-categorySchema.pre("validate", function setSlug(name) {
-  if (this.isModified("name") || !this.slug) this.slug = convertToSlug(name);
-  next();
+categorySchema.pre("validate", function () {
+  if (this.isModified("name") || !this.slug) {
+    this.slug = convertToSlug(this.name) - nanoId();
+  }
 });
 
 const CategoryModel = mongoose.model("Category", categorySchema);

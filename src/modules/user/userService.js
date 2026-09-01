@@ -38,7 +38,7 @@ const updateProfileService = async (id, data, file) => {
     updatedData.profilePhoto = image;
   }
   const result = await UserModel.findByIdAndUpdate(id, updatedData, {
-    new: true,
+    returnDocument: "after",
     runValidators: true,
   });
 

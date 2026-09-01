@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { convertToSlug } = require("../utils/slug");
 
 const brandSchema = new mongoose.Schema(
   {
@@ -31,4 +32,12 @@ const brandSchema = new mongoose.Schema(
   },
 );
 
-module.exports = mongoose.model("Brand", brandSchema);
+brandSchema.pre("validate", function () {
+  if (this.isModified("name") || !this.slug) {
+    this.slug = convertToSlug(this.name);
+  }
+});
+
+const BrandModel = mongoose.model("Brand", brandSchema);
+
+module.exports = BrandModel;
