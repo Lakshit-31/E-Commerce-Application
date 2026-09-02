@@ -141,20 +141,22 @@ productSchema.set("toJSON", {
 productSchema.set("toObject", {
   virtuals: true,
 });
-productSchema.pre("validate", function (next) {
-  if (this.isModified("title") || !this.slug) {
-    this.slug = this.slug = convertToSlug(this.name) - nanoId();
-  }
 
-  next();
+productSchema.pre("validate", function () {
+  if (this.isModified("title") || !this.slug) {
+    this.slug = convertToSlug(this.title);
+  }
 });
 
-productSchema.pre("validate", function (next) {
+productSchema.pre("validate", function () {
   if (this.price > this.mrp) {
     this.invalidate("price", "Price cannot exceed MRP");
   }
-  next();
 });
+
+productSchema.index({ isActive: 1, category: 1, price: 1 });
+productSchema.index({ seller: 1, createdAt: -1 });
+productSchema.index({ title: "text" });
 
 const ProductModel = mongoose.model("Product", productSchema);
 

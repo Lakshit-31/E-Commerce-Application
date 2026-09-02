@@ -4,10 +4,12 @@ const BrandController = require("./brandController");
 const { upload } = require("../../middlewares/uploadmiddleware");
 const loadResource = require("../../middlewares/loadResourcemiddleware");
 const BrandModel = require("../../models/brandModel");
+const validattionMiddleware = require("../../middlewares/authenticatemiddleware");
 
 // get all brands (Public)
 BrandRouter.get("/", BrandController.getBrandsController);
 
+BrandRouter.use(validattionMiddleware);
 // Private
 BrandRouter.post(
   "/",

@@ -3,6 +3,7 @@ const CategoryController = require("./categorycontroller");
 const { upload } = require("../../middlewares/uploadmiddleware");
 const loadResource = require("../../middlewares/loadResourcemiddleware");
 const CategoryModel = require("../../models/categoryModel");
+const validattionMiddleware = require("../../middlewares/authenticatemiddleware");
 const categoryRouter = express.Router();
 
 // get all categories tree
@@ -11,6 +12,7 @@ categoryRouter.get("/tree", CategoryController.getCateoriesTreeController);
 // get all categories
 categoryRouter.get("/", CategoryController.getAllCategoriesController);
 
+categoryRouter.use(validattionMiddleware);
 // create Category
 categoryRouter.post(
   "/",

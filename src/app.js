@@ -4,24 +4,34 @@ const apiResponse = require("./utils/apiResponse");
 const AuthRouter = require("./modules/auth/authRoutes");
 const UserRouter = require("./modules/user/userRoutes");
 const CategoryRouter = require("./modules/category/categoryroutes");
+const CartRouter = require("./modules/cart/cartRoutes");
 require("dotenv").config();
 const cookieParser = require("cookie-parser");
 const notFound = require("./middlewares/notFoundmiddleware");
 const errorHandler = require("./middlewares/errorHandlermiddleware");
 const asyncHandler = require("./utils/asyncHandler");
 const BrandRouter = require("./modules/brand/brandRoutes");
-
+const ProductRouter = require("./modules/product/productRoutes");
+const swaggerUi = require("swagger-ui-express");
+const swaggerFile = require("./swagger-output.json");
 const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
-
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerFile, {
+    swaggerOptions: { withCredentials: true },
+  }),
+);
 // All routes
 app.use("/api/v1/auth", AuthRouter);
 app.use("/api/v1/user", UserRouter);
 app.use("/api/v1/categories", CategoryRouter);
 app.use("/api/v1/brands", BrandRouter);
-// app.use("/api/v1/products", ProductRouter);
+app.use("/api/v1/products", ProductRouter);
+app.use("/api/v1/cart", CartRouter);
 
 app.get("/api/v1/health", (req, res) =>
   res.status(200).json(

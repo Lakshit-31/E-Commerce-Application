@@ -46,7 +46,7 @@ const categorySchema = new mongoose.Schema(
 
 categorySchema.pre("validate", function () {
   if (this.isModified("name") || !this.slug) {
-    this.slug = convertToSlug(this.name) - nanoId();
+    this.slug = convertToSlug(this.name);
   }
 });
 
